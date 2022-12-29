@@ -1,2 +1,2 @@
-# pq
-Priority Queue which implemented on Go
+# ⑉PQ
+Go implementation of Priority Queue
