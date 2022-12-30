@@ -18,7 +18,7 @@ func TestNew_GenericType(t *testing.T) {
 				t.Errorf("func New is in a panic: %v", r)
 			}
 		}()
-		pq := prqueue.New[int](func(a, b int) bool {
+		pq := prqueue.New(func(a, b int) bool {
 			return a < b
 		})
 		_ = pq
@@ -30,7 +30,7 @@ func TestNew_GenericType(t *testing.T) {
 				t.Errorf("func New is in a panic: %v", r)
 			}
 		}()
-		pq := prqueue.New[string](func(a, b string) bool {
+		pq := prqueue.New(func(a, b string) bool {
 			return a < b
 		})
 		_ = pq
@@ -45,7 +45,7 @@ func TestNew_GenericType(t *testing.T) {
 		type tmp struct {
 			t int
 		}
-		pq := prqueue.New[tmp](func(a, b tmp) bool {
+		pq := prqueue.New(func(a, b tmp) bool {
 			return a.t < b.t
 		})
 		_ = pq
@@ -60,7 +60,7 @@ func TestNew_GenericType(t *testing.T) {
 		type tmp struct {
 			t int
 		}
-		pq := prqueue.New[*tmp](func(a, b *tmp) bool {
+		pq := prqueue.New(func(a, b *tmp) bool {
 			return a.t < b.t
 		})
 		_ = pq
@@ -75,7 +75,7 @@ func TestAdd(t *testing.T) {
 				t.Errorf("func Add is in a panic: %v", r)
 			}
 		}()
-		pq := prqueue.New[int](func(a, b int) bool {
+		pq := prqueue.New(func(a, b int) bool {
 			return a < b
 		})
 		for i := 0; i < 10; i++ {
@@ -102,7 +102,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestLen(t *testing.T) {
-	pq := prqueue.New[int](func(a, b int) bool {
+	pq := prqueue.New(func(a, b int) bool {
 		return a < b
 	})
 	max := rand.Intn(100) + 100
@@ -121,7 +121,7 @@ func TestPoll0(t *testing.T) {
 			t.Errorf("func Poll is in a panic: %v", r)
 		}
 	}()
-	pq := prqueue.New[int](func(a, b int) bool {
+	pq := prqueue.New(func(a, b int) bool {
 		return a < b
 	})
 	if _, err := pq.Poll(); err == nil {
@@ -148,7 +148,7 @@ func TestPoll1(t *testing.T) {
 		copy(ordl, l)
 		sort.Ints(ordl)
 
-		pq := prqueue.New[int](func(a, b int) bool {
+		pq := prqueue.New(func(a, b int) bool {
 			return a < b
 		})
 		for _, v := range l {
@@ -169,7 +169,7 @@ func TestPoll1(t *testing.T) {
 		copy(ordl, l)
 		sort.Sort(sort.Reverse(sort.IntSlice(ordl)))
 
-		pq := prqueue.New[int](func(a, b int) bool {
+		pq := prqueue.New(func(a, b int) bool {
 			return a > b
 		})
 		for _, v := range l {
@@ -186,7 +186,7 @@ func TestPoll1(t *testing.T) {
 }
 
 func TestPoll2(t *testing.T) {
-	pq := prqueue.New[int](func(a, b int) bool {
+	pq := prqueue.New(func(a, b int) bool {
 		return a > b
 	})
 	_, err := pq.Poll()
@@ -201,7 +201,7 @@ func TestIsEmpty(t *testing.T) {
 			t.Errorf("func IsEmpty is in a panic: %v", r)
 		}
 	}()
-	pq := prqueue.New[int](func(a, b int) bool {
+	pq := prqueue.New(func(a, b int) bool {
 		return a < b
 	})
 	if !pq.IsEmpty() {
@@ -221,7 +221,7 @@ func TestPeek0(t *testing.T) {
 	t.Run("Min heap correctness", func(t *testing.T) {
 		l := []int{1, 3, 5, 2, 4}
 
-		pq := prqueue.New[int](func(a, b int) bool {
+		pq := prqueue.New(func(a, b int) bool {
 			return a < b
 		})
 		for _, v := range l {
@@ -240,7 +240,7 @@ func TestPeek0(t *testing.T) {
 	t.Run("Max heap correctness", func(t *testing.T) {
 		l := []int{1, 3, 5, 2, 4}
 
-		pq := prqueue.New[int](func(a, b int) bool {
+		pq := prqueue.New(func(a, b int) bool {
 			return a > b
 		})
 		for _, v := range l {
@@ -258,7 +258,7 @@ func TestPeek0(t *testing.T) {
 }
 
 func TestPeek1(t *testing.T) {
-	pq := prqueue.New[int](func(a, b int) bool {
+	pq := prqueue.New(func(a, b int) bool {
 		return a > b
 	})
 	_, err := pq.Peek()
@@ -271,7 +271,7 @@ func TestString(t *testing.T) {
 	t.Run("String representation for int", func(t *testing.T) {
 		l := []int{1, 3, 5, 2, 4}
 		heapVer := "[1 2 5 3 4]"
-		pq := prqueue.New[int](func(a, b int) bool {
+		pq := prqueue.New(func(a, b int) bool {
 			return a < b
 		})
 		for _, v := range l {

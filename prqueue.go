@@ -1,3 +1,20 @@
+// Package prqueue implements a priority queue with generics and ability to send comparator-func as a constructor argument.
+//
+// Synopsis:
+//
+// 	pqmin := prqueue.New(func(a, b int) bool { return a < b })
+// 	pqmax := prqueue.New(func(a, b int) bool { return a > b })
+//
+// 	type custom struct {
+// 		w int
+// 	}
+// 	pq := prqueue.New(func(a, b custom) bool { return a.w < b.w })
+//
+// 	pq.Add(el)
+// 	el, err := pq.Poll()	// Retrieves and removes
+// 	el, err := pq.Peek()	// Retrieves, but does not remove
+// 	pq.IsEmpty()			// bool
+// 	pq.Len()				// bool
 package prqueue
 
 import (
@@ -7,6 +24,7 @@ import (
 	"sync"
 )
 
+// ErrEmptyQueue is error which indicates about empty queue
 var ErrEmptyQueue = errors.New("priority queue is empty")
 
 type PQ[T any] struct {
