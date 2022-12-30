@@ -1,5 +1,7 @@
 // Package prqueue implements a priority queue with generics and ability to send comparator-func as a constructor argument.
 //
+// Operations Add, Poll, Peek are thread safe.
+//
 // Synopsis:
 //
 // 	pqmin := prqueue.New(func(a, b int) bool { return a < b })
@@ -8,7 +10,8 @@
 // 	type custom struct {
 // 		w int
 // 	}
-// 	pq := prqueue.New(func(a, b custom) bool { return a.w < b.w })
+// 	pqmin := prqueue.New(func(a, b custom) bool { return a.w < b.w })
+// 	pqmax := prqueue.New(func(a, b custom) bool { return a.w > b.w })
 //
 // 	pq.Add(el)
 // 	el, err := pq.Poll()	// Retrieves and removes
@@ -27,14 +30,22 @@ import (
 // ErrEmptyQueue is error which indicates about empty queue
 var ErrEmptyQueue = errors.New("priority queue is empty")
 
-type PQ[T any] struct {
+type pqs[T any] struct {
 	mu   sync.RWMutex
 	list []T
 	cmp  func(a, b T) bool
 }
 
-func New[T any](cmp func(a, b T) bool, c ...int) (pq *PQ[T]) {
-	pq = &PQ[T]{cmp: cmp}
+// New recieves a comparator-func and optional capacity.
+//
+//	pq := prqueue.New(1000, func(a, b int) bool { return a < b })
+//	pq := prqueue.New(func(a, b int) bool { return a < b })
+//
+//
+// 	pqmin := prqueue.New(func(a, b int) bool { return a < b })
+// 	pqmax := prqueue.New(func(a, b int) bool { return a > b })
+func New[T any](cmp func(a, b T) bool, c ...int) (pq *pqs[T]) {
+	pq = &pqs[T]{cmp: cmp}
 	if len(c) != 0 {
 		pq.list = make([]T, 0, c[0])
 	} else {
@@ -43,13 +54,15 @@ func New[T any](cmp func(a, b T) bool, c ...int) (pq *PQ[T]) {
 	return
 }
 
-func (pq *PQ[T]) Add(el T) {
+// Add inserts the specified element into this priority queue. Thread safe.
+func (pq *pqs[T]) Add(el T) {
 	pq.mu.Lock()
 	defer pq.mu.Unlock()
 	heap.Push(pq, el)
 }
 
-func (pq *PQ[T]) Poll() (el T, er error) {
+// Poll retrieves and removes the head of this queue, or return error ErrEmptyQueue. Thread safe.
+func (pq *pqs[T]) Poll() (el T, er error) {
 	pq.mu.Lock()
 	defer pq.mu.Unlock()
 	if len(pq.list) > 0 {
@@ -60,7 +73,8 @@ func (pq *PQ[T]) Poll() (el T, er error) {
 	return
 }
 
-func (pq *PQ[T]) Peek() (el T, er error) {
+// Peek retrieves, but does not remove, the head of this queue, or return error ErrEmptyQueue. Thread safe.
+func (pq *pqs[T]) Peek() (el T, er error) {
 	pq.mu.RLock()
 	defer pq.mu.RUnlock()
 	if len(pq.list) > 0 {
@@ -71,35 +85,36 @@ func (pq *PQ[T]) Peek() (el T, er error) {
 	return
 }
 
-func (pq *PQ[T]) IsEmpty() bool {
+// IsEmpty returns true if this collection contains no elements.
+func (pq *pqs[T]) IsEmpty() bool {
 	pq.mu.RLock()
 	defer pq.mu.RUnlock()
 	return len(pq.list) == 0
 }
 
-func (pq *PQ[T]) String() string {
+func (pq *pqs[T]) String() string {
 	return fmt.Sprintf("%v", pq.list)
 }
 
-// ==========
+//================================
 
-func (pq *PQ[T]) Push(e any) {
+func (pq *pqs[T]) Push(e any) {
 	pq.list = append(pq.list, e.(T))
 }
 
-func (pq *PQ[T]) Len() int {
+func (pq *pqs[T]) Len() int {
 	return len(pq.list)
 }
 
-func (pq *PQ[T]) Less(i, j int) bool {
+func (pq *pqs[T]) Less(i, j int) bool {
 	return pq.cmp(pq.list[i], pq.list[j])
 }
 
-func (pq *PQ[T]) Swap(i, j int) {
+func (pq *pqs[T]) Swap(i, j int) {
 	pq.list[i], pq.list[j] = pq.list[j], pq.list[i]
 }
 
-func (pq *PQ[T]) Pop() (e any) {
+func (pq *pqs[T]) Pop() (e any) {
 	lidx := len(pq.list) - 1
 	e = pq.list[lidx]
 	var tmp T
