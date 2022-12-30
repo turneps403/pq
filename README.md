@@ -18,6 +18,6 @@ pqMax := prqueue.New(func(a, b custom) bool { return a.w > b.w })
 pq.Add(el)
 el, err := pq.Poll()	// Retrieves and removes
 el, err := pq.Peek()	// Retrieves, but does not remove
-pq.IsEmpty()		    // bool
-pq.Len()			    // bool
+pq.IsEmpty()		   // bool
+pq.Len()			   // bool
 ```
