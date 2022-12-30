@@ -1,6 +1,6 @@
 // Package prqueue implements a priority queue with generics and ability to send comparator-func as a constructor argument.
 //
-// Operations Add, Poll, Peek are thread safe.
+// For documentation expand section above.
 package prqueue
 
 import (
@@ -10,7 +10,6 @@ import (
 	"sync"
 )
 
-// ErrEmptyQueue is error which indicates about empty queue.
 var ErrEmptyQueue = errors.New("priority queue is empty")
 
 type pqs[T any] struct {
@@ -19,14 +18,6 @@ type pqs[T any] struct {
 	cmp  func(a, b T) bool
 }
 
-// New recieves a comparator-func and optional capacity.
-//
-//	pq := prqueue.New(1000, func(a, b int) bool { return a < b })
-//	pq := prqueue.New(func(a, b int) bool { return a < b })
-//
-//
-// 	pqmin := prqueue.New(func(a, b int) bool { return a < b })
-// 	pqmax := prqueue.New(func(a, b int) bool { return a > b })
 func New[T any](cmp func(a, b T) bool, c ...int) (pq *pqs[T]) {
 	pq = &pqs[T]{cmp: cmp}
 	if len(c) != 0 {
@@ -37,14 +28,12 @@ func New[T any](cmp func(a, b T) bool, c ...int) (pq *pqs[T]) {
 	return
 }
 
-// Add inserts the specified element into this priority queue. Thread safe.
 func (pq *pqs[T]) Add(el T) {
 	pq.mu.Lock()
 	defer pq.mu.Unlock()
 	heap.Push(pq, el)
 }
 
-// Poll retrieves and removes the head of this queue, or return error ErrEmptyQueue. Thread safe.
 func (pq *pqs[T]) Poll() (el T, er error) {
 	pq.mu.Lock()
 	defer pq.mu.Unlock()
@@ -56,7 +45,6 @@ func (pq *pqs[T]) Poll() (el T, er error) {
 	return
 }
 
-// Peek retrieves, but does not remove, the head of this queue, or return error ErrEmptyQueue. Thread safe.
 func (pq *pqs[T]) Peek() (el T, er error) {
 	pq.mu.RLock()
 	defer pq.mu.RUnlock()
@@ -68,7 +56,6 @@ func (pq *pqs[T]) Peek() (el T, er error) {
 	return
 }
 
-// IsEmpty returns true if this collection contains no elements.
 func (pq *pqs[T]) IsEmpty() bool {
 	pq.mu.RLock()
 	defer pq.mu.RUnlock()

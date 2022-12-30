@@ -10,7 +10,6 @@ import (
 	"github.com/turneps403/prqueue"
 )
 
-// TestNew_GenericType will check generics specific on a time of creation object
 func TestNew_GenericType(t *testing.T) {
 	t.Run("New for generic int", func(t *testing.T) {
 		defer func() {
